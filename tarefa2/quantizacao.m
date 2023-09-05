@@ -1,10 +1,10 @@
 function quantizacao()
     % Parâmetros
     block_size = 2;
-    dictionary_size = 256;
+    dictionary_size = 32;
 
     % Carregue a imagem de entrada em tons de cinza
-    input_image = imread('cameraman.tif');
+    input_image = imread('kids.tif');
     input_image = double(input_image);
 
     % Divida a imagem em blocos
@@ -43,12 +43,38 @@ function quantizacao()
     end
 
     % Exiba a imagem de entrada e a imagem de saída lado a lado
-    figure;
-    subplot(1, 2, 1);
-    imshow(uint8(input_image), []);
+    figure,imshow(uint8(input_image), []);
     title('Imagem de Entrada');
 
-    subplot(1, 2, 2);
-    imshow(uint8(output_image), []);
+
+    figure,imshow(uint8(output_image), []);
     title('Imagem Quantizada');
+    
+    
+    L = block_size*block_size;
+    
+    fprintf('tamanho da memoria da imagem de entrada = %d bytes\n',numel(input_image));
+    disp('');
+    fprintf('tamanho da memoria da imagem de saida %d bytes\n', dictionary_size*L+numel(output_image)/L);
+    disp('');
+    
+    fprintf('taxa de compressão (bits de entrada x bits de saida): %.2f x %d\n',double(numel(input_image))/double(dictionary_size*L+numel(output_image)/L),1);
+    disp('');
+    
+    SNR=10*log10(std2(double(input_image))^2/std2(double(input_image)-double(output_image))^2);
+    
+    I_max = max(max(double(input_image)));
+    I_min = min(min(double(input_image)));
+    
+    A = (I_max- I_min);
+    PSNR = 10*log10((A^2)/(std2(double(input_image)-double(output_image))^2));
+    
+    fprintf('SNR = %.2f (dB)\n',SNR);
+    disp('')
+    fprintf('PSNR = %.2f (dB)\n',PSNR);
+    disp('')
+    
+    
+    imwrite(output_image,'saida.tif','tif');
+    
 end

@@ -1,5 +1,4 @@
 function [cluster_indices, centroids] = kmeans_algorithm(data, k, max_iterations)
-    % Inicialização aleatória dos centróides
     num_samples = size(data, 1);
     num_features = size(data, 2);
     centroids = data(randperm(num_samples, k), :);
