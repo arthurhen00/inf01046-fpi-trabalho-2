@@ -25,9 +25,10 @@ function saida = JPEG_compression_cos(gray_image, compressao)
     % Matriz para guardar a DCT
     DCT = zeros(altura, largura);
     
+    
     % ******************************************************************
     % COMP
-    % Aplicar a DCT em blocos 8x8
+    % Aplicar a DCT em blocos 8x8 (transformada do cosseno)
     for i = 1:nova_altura/tam_bloco
         for j = 1:nova_largura/tam_bloco
             y_inicio = (i - 1) * tam_bloco + 1;
@@ -58,6 +59,14 @@ function saida = JPEG_compression_cos(gray_image, compressao)
                     72 92 95 98 112 100 103  99;];
 
     matriz_quantizacao = matriz_quantizacao * compressao;
+
+    % limita o intervalo [1, 255]
+    for i=1:8
+        for j=1:8
+            matriz_quantizacao(i, j) = min(matriz_quantizacao(i, j), 255);
+            matriz_quantizacao(i, j) = max(matriz_quantizacao(i, j), 1);
+        end
+    end
 
     % Inicializar a matriz para armazenar os coeficientes quantizados
     coeficientes_quantizados = zeros(nova_altura, nova_largura);
@@ -100,32 +109,6 @@ function saida = JPEG_compression_cos(gray_image, compressao)
             coeficientes_idct(y_inicio:y_fim, x_inicio:x_fim) = idct_bloco;
         end
     end
-
-    % ******************************************************************
-    %
-    % Inicializar a matriz para a imagem reconstruída
-    %
-    %imagem_reconstruida = zeros(nova_altura, nova_largura);
-    %
-    % Reconstruir a imagem completa unindo os blocos reconstruídos
-    %for i = 1:nova_altura/tam_bloco
-    %    for j = 1:nova_largura/tam_bloco
-    %        y_inicio = (i - 1) * tam_bloco + 1;
-    %        y_fim = y_inicio + tam_bloco - 1;
-    %        
-    %        x_inicio = (j - 1) * tam_bloco + 1;
-    %        x_fim = x_inicio + tam_bloco - 1;
-    %        
-    %        bloco_reconstruido = coeficientes_idct(y_inicio:y_fim, x_inicio:x_fim);
-    %        imagem_reconstruida(y_inicio:y_fim, x_inicio:x_fim) = bloco_reconstruido;
-    %    end
-    %end
-    %
-    % Exibe
-    %subplot(2,2,1), imshow(uint8(imagem)), title('original');
-    %subplot(2,2,3), imshow(uint8(DCT)), title('DCT');
-    %subplot(2,2,4), imshow(uint8(coeficientes_quantizados)), title('coeficientes_quantizados');
-    %subplot(2,2,2), imshow(uint8(coeficientes_idct)), title('imagem_recontruida');
 
     imwrite(uint8(coeficientes_idct), sprintf('./saida/saida_%d.jpg', compressao), 'jpg');
 
