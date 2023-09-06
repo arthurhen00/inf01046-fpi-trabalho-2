@@ -1,8 +1,9 @@
-function [] = texture( I, filter_size, theta, nTries, nGroups )
+function [] = texture( I, filter_size, theta, nTries )
 
 close all;
 
 I_gray = double(I);
+nGroups = 4;
 numRows = size(I_gray, 1) - filter_size;
 numCols = size(I_gray, 2) - filter_size;
 degree = 0:theta:360 - theta;
@@ -43,12 +44,3 @@ pixel_labels = reshape(idx, numRows, numCols);
 
 % Rotula os pixels usando os resultados do k-means
 figure, imshow(pixel_labels, []), title('Imagem rotulada');
-
-% Cria uma imagem para cada cor da imagem de entrada
-rgb_label = repmat(pixel_labels, [1 1 3]);
-
-for k = 1:nGroups
-    color = I(1:numRows, 1:numCols, :);
-    color(rgb_label ~= k) = 0;
-    figure, imshow(color), title(sprintf('Grupo %d', k));
-end
